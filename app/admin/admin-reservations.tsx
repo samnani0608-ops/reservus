@@ -16,9 +16,10 @@ export default async function AdminReservations({
   ]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold">Gestión de reservas</h3>
+    <div className="mt-6 space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-white">Gestión de reservas</h3>
+        <p className="mt-1 text-sm text-slate-500">Filtrá la agenda y cancelá bloques con un motivo registrado.</p>
       </div>
 
       <AdminReservationsTable

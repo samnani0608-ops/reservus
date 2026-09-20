@@ -22,46 +22,48 @@ async function RoomsList() {
 
   if (error) {
     return (
-      <p className="text-gray-500">No hay salas registradas.</p>
+      <p role="alert" className="rounded-xl border border-rose-300/15 bg-rose-300/7 p-4 text-sm text-rose-200">
+        No se pudieron cargar las salas.
+      </p>
     );
   }
 
   const rooms = data ?? [];
 
   return (
-    <div className="mt-4 space-y-3">
+    <div className="space-y-3">
       {rooms.length === 0 ? (
-        <p className="text-gray-500">No hay salas registradas.</p>
+        <p className="rounded-xl border border-dashed border-white/10 p-7 text-center text-sm text-slate-600">No hay salas registradas.</p>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="overflow-x-auto rounded-2xl border border-white/8">
+          <table className="min-w-[680px] divide-y divide-white/8">
+            <thead className="bg-white/3">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                   Nombre
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                   Capacidad
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                   Estado
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-slate-500">
                   Acciones
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-white/7">
               {rooms.map((room) => (
-                <tr key={room.id}>
-                  <td className="px-4 py-3 text-sm">{room.name}</td>
-                  <td className="px-4 py-3 text-sm">{room.capacity}</td>
+                <tr key={room.id} className="hover:bg-white/2">
+                  <td className="px-4 py-4 text-sm font-semibold text-white">{room.name}</td>
+                  <td className="px-4 py-4 text-sm text-slate-400">{room.capacity} personas</td>
                   <td className="px-4 py-3 text-sm">
                     <span
-                      className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${
                         room.is_active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
+                          ? "border-emerald-300/20 bg-emerald-300/8 text-emerald-300"
+                          : "border-rose-300/15 bg-rose-300/7 text-rose-200"
                       }`}
                     >
                       {room.is_active ? "Activa" : "Inactiva"}
@@ -83,13 +85,16 @@ async function RoomsList() {
 // Exporta el componente de la pestaña Salas (Server Component).
 export default async function AdminRooms() {
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-xl font-semibold">Gestión de salas</h3>
+    <div className="mt-6 space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-white">Gestión de salas</h3>
+          <p className="mt-1 text-sm text-slate-500">Creá, editá o desactivá espacios sin borrar su historial.</p>
+        </div>
         <AdminNewRoomButton />
       </div>
 
-      <Suspense fallback={<p className="mt-4">Cargando salas...</p>}>
+      <Suspense fallback={<p className="text-sm text-slate-500">Cargando salas...</p>}>
         <RoomsList />
       </Suspense>
     </div>

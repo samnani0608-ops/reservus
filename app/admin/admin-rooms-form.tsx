@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useId } from "react";
 import { createRoom, updateRoom, type Room, type AdminActionState } from "./actions";
 
 const initialState: AdminActionState = { success: false, error: null };
@@ -12,6 +12,10 @@ type RoomFormProps = {
 
 export function AdminRoomsForm({ room, onClose }: RoomFormProps) {
   const isEditing = !!room;
+  const fieldPrefix = useId();
+  const nameId = `${fieldPrefix}-name`;
+  const capacityId = `${fieldPrefix}-capacity`;
+  const activeId = `${fieldPrefix}-active`;
 
   const [createState, createAction, createPending] = useActionState(createRoom, initialState);
   const [updateState, updateAction, updatePending] = useActionState(updateRoom, initialState);
@@ -21,67 +25,67 @@ export function AdminRoomsForm({ room, onClose }: RoomFormProps) {
   const action = isEditing ? updateAction : createAction;
 
   return (
-    <form action={action} className="mt-4 flex max-w-md flex-col gap-4">
+    <form action={action} className="mt-4 flex min-w-64 max-w-md flex-col gap-4 rounded-2xl border border-white/8 bg-black/20 p-4">
       <input type="hidden" name="room_id" value={room?.id ?? ""} />
 
       <div>
-        <label htmlFor="room-name" className="block font-medium">
+        <label htmlFor={nameId} className="block text-sm font-semibold text-slate-300">
           Nombre
         </label>
         <input
-          id="room-name"
+          id={nameId}
           name="name"
           type="text"
           required
           maxLength={100}
           defaultValue={room?.name ?? ""}
-          className="mt-1 w-full rounded border p-2"
+          className="mt-2 w-full rounded-xl border px-3 py-2.5 text-sm"
         />
       </div>
 
       <div>
-        <label htmlFor="room-capacity" className="block font-medium">
+        <label htmlFor={capacityId} className="block text-sm font-semibold text-slate-300">
           Capacidad
         </label>
         <input
-          id="room-capacity"
+          id={capacityId}
           name="capacity"
           type="number"
           required
           min="1"
           defaultValue={room?.capacity ?? ""}
-          className="mt-1 w-full rounded border p-2"
+          className="mt-2 w-full rounded-xl border px-3 py-2.5 text-sm"
         />
       </div>
 
       <div className="flex items-center gap-2">
         <input
-          id="room-active"
+          id={activeId}
           name="is_active"
           type="checkbox"
           value="true"
           defaultChecked={room?.is_active ?? true}
         />
-        <label htmlFor="room-active" className="font-medium">
+        <label htmlFor={activeId} className="text-sm font-medium text-slate-300">
           Sala activa
         </label>
       </div>
 
       {state.error && (
-        <p className="text-sm text-red-600">{state.error}</p>
+        <p role="alert" className="text-sm text-rose-300">{state.error}</p>
       )}
 
       {state.success && (
-        <p className="text-sm font-medium text-green-600">
+        <p aria-live="polite" className="text-sm font-medium text-emerald-300">
           {isEditing ? "Sala actualizada correctamente." : "Sala creada correctamente."}
         </p>
       )}
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           type="submit"
           disabled={pending}
-          className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+          className="rounded-xl bg-emerald-300 px-4 py-2.5 text-sm font-black text-emerald-950 hover:bg-emerald-200 disabled:opacity-50"
         >
           {pending
             ? "Guardando..."
@@ -93,7 +97,7 @@ export function AdminRoomsForm({ room, onClose }: RoomFormProps) {
           type="button"
           onClick={onClose}
           disabled={pending}
-          className="rounded border px-4 py-2 disabled:opacity-50"
+          className="rounded-xl border border-white/10 px-4 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/5 disabled:opacity-50"
         >
           Cancelar
         </button>

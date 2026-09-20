@@ -69,20 +69,31 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   };
 
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold">Panel de administración</h1>
-      <p className="mt-4 text-gray-600">
-        Bienvenido, administrador. Gestioná salas y reservas desde aquí.
-      </p>
+    <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
+      <section className="border-b border-white/8 pb-10">
+        <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-300">Centro de control</p>
+        <h1 className="mt-3 text-4xl font-black tracking-[-0.045em] text-white sm:text-6xl">
+          Administración
+        </h1>
+        <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400">
+          Gestioná la capacidad operativa, el estado de las salas y la agenda completa.
+        </p>
+      </section>
 
-      <div className="mt-10 space-y-10">
-        <section>
-          <h2 className="text-2xl font-bold border-b pb-2">Salas</h2>
+      <div className="mt-12 space-y-14">
+        <section aria-labelledby="rooms-title" className="rounded-[1.5rem] border border-white/9 bg-[#0c121a]/88 p-5 sm:p-7">
+          <div className="border-b border-white/8 pb-5">
+            <p className="font-mono text-xs text-slate-600">01 / INVENTARIO</p>
+            <h2 id="rooms-title" className="mt-2 text-2xl font-bold text-white">Salas</h2>
+          </div>
           <AdminRooms />
         </section>
 
-        <section>
-          <h2 className="text-2xl font-bold border-b pb-2">Reservas</h2>
+        <section aria-labelledby="reservations-title" className="rounded-[1.5rem] border border-white/9 bg-[#0c121a]/88 p-5 sm:p-7">
+          <div className="border-b border-white/8 pb-5">
+            <p className="font-mono text-xs text-slate-600">02 / OPERACIÓN</p>
+            <h2 id="reservations-title" className="mt-2 text-2xl font-bold text-white">Reservas</h2>
+          </div>
           <AdminReservations filters={filters} />
         </section>
       </div>
