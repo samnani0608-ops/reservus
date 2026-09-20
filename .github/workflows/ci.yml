@@ -1,0 +1,53 @@
+# Nombre que aparecerá en la pestaña Actions de GitHub.
+name: CI
+
+# Este flujo se ejecutará cuando haya un Pull Request
+# dirigido hacia dev o main.
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+
+jobs:
+  validate:
+    # GitHub crea temporalmente una máquina Linux
+    # donde probará nuestro proyecto.
+    runs-on: ubuntu-latest
+
+    # Estas variables se obtendrán desde los Secrets de GitHub.
+    # Así no subimos valores directamente al repositorio.
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+
+    steps:
+      # Descarga nuestro código dentro de la máquina de GitHub.
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      # Instala Node.js.
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      # Instala exactamente las dependencias
+      # guardadas en package-lock.json.
+      - name: Instalar dependencias
+        run: npm ci
+
+      # Comprueba errores de TypeScript
+      # sin generar archivos nuevos.
+      - name: Revisar TypeScript
+        run: npx tsc --noEmit
+
+      # ESLint busca errores y malas prácticas.
+      - name: Revisar ESLint
+        run: npm run lint
+
+      # Finalmente comprobamos que Next.js
+      # pueda generar una versión de producción.
+      - name: Construir proyecto
+        run: npm run build

@@ -1,0 +1,4 @@
+-- db reset ejecuta este placeholder, pero el seed con usuarios se corre aparte.
+-- Necesita crear usuarios en Supabase Auth y se ejecuta con:
+-- npm run seed
+-- La implementación está en scripts/seed.ts.
