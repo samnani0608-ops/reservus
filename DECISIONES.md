@@ -1,7 +1,89 @@
 # Decisiones de Reservus
 
-Esta bitácora comienza con la regla adicional aprobada durante este bloque.
-Queda pendiente incorporar las entradas D1–D5 y las demás decisiones técnicas del reto.
+Las decisiones funcionales se interpretan siempre en `America/Costa_Rica`.
+
+## D1 — Definición de semana
+
+**Problema:** el límite de reservas necesita una semana inequívoca, incluso
+cuando el servidor o el navegador usan otra zona horaria.
+
+**Opciones consideradas:** semana móvil de siete días, semana según UTC o semana
+calendario local.
+
+**Decisión:** la semana va de lunes a domingo y una reserva pertenece a la semana
+de su `start_at` convertido a la fecha local de Costa Rica.
+
+**Motivo:** produce un cupo predecible para usuarios y administradores y evita
+que UTC cambie el día de una reserva cercana a medianoche.
+
+**Tradeoff:** el cupo se reinicia al comenzar cada lunes; no limita cualquier
+ventana móvil de siete días consecutivos.
+
+## D2 — Reservas canceladas y cupo
+
+**Problema:** definir si una cancelación continúa consumiendo el cupo semanal.
+
+**Opciones consideradas:** contar todo el historial o contar solo reservas
+activas.
+
+**Decisión:** solo las reservas con estado `active` cuentan para el máximo de
+tres; una reserva `cancelled` libera tanto el horario como el cupo.
+
+**Motivo:** cancelar permite corregir un plan sin penalizar el resto de la
+semana. El historial se conserva para auditoría.
+
+**Tradeoff:** un usuario puede crear más de tres registros históricos durante la
+semana si cancela, aunque nunca tendrá más de tres activos.
+
+## D3 — Desactivación de salas
+
+**Problema:** decidir qué ocurre con las reservas existentes al desactivar una
+sala.
+
+**Opciones consideradas:** borrar o cancelar reservas futuras, impedir la
+desactivación o conservarlas.
+
+**Decisión:** la desactivación bloquea reservas nuevas, pero conserva todas las
+reservas existentes y su historial.
+
+**Motivo:** evita una modificación masiva implícita y permite que el admin trate
+cada reserva afectada de forma explícita.
+
+**Tradeoff:** pueden quedar reservas futuras activas en una sala inactiva hasta
+que un administrador las gestione.
+
+## D4 — Límite semanal para administradores
+
+**Problema:** el personal administrador puede necesitar crear reservas
+operativas después de alcanzar el cupo normal.
+
+**Opciones consideradas:** aplicar el mismo máximo a todos o eximir al admin.
+
+**Decisión:** el admin está exento del máximo de tres reservas activas por semana.
+Las demás reglas de sala, horario, duración, anticipación y solape sí se aplican.
+
+**Motivo:** el rol administrativo debe poder resolver necesidades operativas sin
+abrir una vía para ignorar la integridad del calendario.
+
+**Tradeoff:** un admin puede concentrar muchas reservas y debe usar el privilegio
+con criterio.
+
+## D5 — Conflictos concurrentes
+
+**Problema:** dos clientes pueden ver libre el mismo bloque e intentar reservarlo
+al mismo tiempo.
+
+**Opciones consideradas:** confiar en la UI, comprobar disponibilidad antes del
+insert o imponer exclusión transaccional en PostgreSQL.
+
+**Decisión:** una restricción GiST excluye solapes activos en la misma sala. La
+base acepta una operación, rechaza la otra y la interfaz revalida disponibilidad.
+
+**Motivo:** solo la base de datos observa todas las transacciones y puede
+garantizar RN01 sin una condición de carrera.
+
+**Tradeoff:** un conflicto esperado llega como error de base de datos y la UI
+debe traducirlo a un mensaje claro.
 
 ## D6 — Anticipación máxima de nuevas reservas
 

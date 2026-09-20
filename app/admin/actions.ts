@@ -47,7 +47,6 @@ export type ReservationWithDetails = {
   room_id: string;
   room_name: string;
   user_id: string;
-  user_email: string;
   start_at: string;
   end_at: string;
   status: "active" | "cancelled";
@@ -139,8 +138,7 @@ export async function updateRoom(
   const supabase = await createClient();
   await requireAdmin(supabase);
 
-  const roomId = formData.get("room_id") as string;
-  const idResult = z.string().uuid().safeParse(roomId);
+  const idResult = z.string().uuid().safeParse(formData.get("room_id"));
 
   if (!idResult.success) {
     return { success: false, error: "ID de sala inválido" };
@@ -190,7 +188,6 @@ export async function listReservations(
       room_id,
       rooms!inner(name),
       user_id,
-      profiles!inner(email),
       start_at,
       end_at,
       status,
@@ -229,19 +226,18 @@ export async function listReservations(
     throw new Error("No se pudieron cargar las reservas.");
   }
 
-  // Transformamos la respuesta anidada a estructura plana.
-  return ((data as any)?.dtoReservations ?? [] as ReservationWithDetails[]).map((r: ReservationWithDetails) => ({
-    id: r.id,
-    room_id: r.room_id,
-    room_name: r.room_name ?? "Desconocida",
-    user_id: r.user_id,
-    user_email: r.user_email ?? "Desconocido",
-    start_at: r.start_at,
-    end_at: r.end_at,
-    status: r.status,
-    cancel_reason: r.cancel_reason,
-    cancelled_at: r.cancelled_at,
-    created_at: r.created_at,
+  // profiles no almacena correo; mostramos el UUID sin exponer auth.users.
+  return (data ?? []).map((reservation) => ({
+    id: reservation.id,
+    room_id: reservation.room_id,
+    room_name: reservation.rooms.name,
+    user_id: reservation.user_id,
+    start_at: reservation.start_at,
+    end_at: reservation.end_at,
+    status: reservation.status,
+    cancel_reason: reservation.cancel_reason,
+    cancelled_at: reservation.cancelled_at,
+    created_at: reservation.created_at,
   }));
 }
 

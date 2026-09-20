@@ -59,6 +59,13 @@ export default async function DashboardPage() {
     .eq("is_active", true)
     .order("name");
 
+  // El rol se consulta en servidor para mostrar el acceso administrativo.
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .single();
+
     /*
   Supabase puede devolver "null" en data.
 
@@ -87,15 +94,33 @@ const roomList = rooms ?? [];
       </p>
 
 
-      {/* Botón de cerrar sesión que ya habíamos creado */}
-      <form action={logout} className="mt-6">
-        <button
-          type="submit"
+      <div className="mt-6 flex flex-wrap gap-3">
+        <Link
+          href="/reservations"
           className="rounded bg-black px-4 py-2 text-white"
         >
-          Cerrar sesión
-        </button>
-      </form>
+          Mis reservas
+        </Link>
+
+        {profile?.role === "admin" && (
+          <Link
+            href="/admin"
+            className="rounded border border-black px-4 py-2"
+          >
+            Panel de administración
+          </Link>
+        )}
+
+        {/* Botón de cerrar sesión que ya habíamos creado */}
+        <form action={logout}>
+          <button
+            type="submit"
+            className="rounded border border-slate-300 px-4 py-2"
+          >
+            Cerrar sesión
+          </button>
+        </form>
+      </div>
 
 
       {/* Sección de salas disponibles */}

@@ -59,6 +59,7 @@ export function AdminRoomsForm({ room, onClose }: RoomFormProps) {
           id="room-active"
           name="is_active"
           type="checkbox"
+          value="true"
           defaultChecked={room?.is_active ?? true}
         />
         <label htmlFor="room-active" className="font-medium">

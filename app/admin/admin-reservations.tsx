@@ -1,19 +1,31 @@
-// Server Component principal de la pestaña Reservas.
-import { createClient } from "@/lib/supabase/server";
 import AdminReservationsTable from "./admin-reservations-table";
-import { Suspense } from "react";
+import {
+  listReservations,
+  listRooms,
+  type ReservationFilters,
+} from "./actions";
 
-// Componente principal de la pestaña Reservas (Server Component).
-export default async function AdminReservations() {
+export default async function AdminReservations({
+  filters,
+}: {
+  filters: ReservationFilters;
+}) {
+  const [reservations, rooms] = await Promise.all([
+    listReservations(filters),
+    listRooms(),
+  ]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h3 className="text-xl font-semibold">Gestión de reservas</h3>
       </div>
 
-      <Suspense fallback={<p className="mt-4">Cargando reservas...</p>}>
-        <AdminReservationsTable />
-      </Suspense>
+      <AdminReservationsTable
+        reservations={reservations}
+        rooms={rooms}
+        filters={filters}
+      />
     </div>
   );
 }

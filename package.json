@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "test:concurrency": "tsx --env-file=.env.local scripts/concurrencia.ts",
+    "test:security": "tsx --env-file=.env.local scripts/seguridad.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -25,6 +29,7 @@
     "eslint-config-next": "16.3.5",
     "supabase": "^2.117.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.13",
     "typescript": "^5"
   }
 }
