@@ -20,9 +20,9 @@ export default function AdminCancelReservationForm({
   );
 
   return (
-    <form action={formAction} className="min-w-56 space-y-2">
+    <form action={formAction} className="min-w-52 space-y-2">
       <input type="hidden" name="reservation_id" value={reservationId} />
-      <label className="block text-xs font-medium" htmlFor={`admin-reason-${reservationId}`}>
+      <label className="block text-xs font-semibold text-slate-400" htmlFor={`admin-reason-${reservationId}`}>
         Motivo obligatorio
       </label>
       <textarea
@@ -31,14 +31,15 @@ export default function AdminCancelReservationForm({
         required
         maxLength={300}
         rows={2}
-        className="w-full rounded-lg border border-slate-300 px-2 py-1"
+        placeholder="Motivo de cancelación"
+        className="w-full rounded-lg border px-2.5 py-2 text-xs"
       />
-      {state.error && <p className="text-xs text-red-700">{state.error}</p>}
-      {state.success && <p className="text-xs text-emerald-700">Reserva cancelada.</p>}
+      {state.error && <p role="alert" className="text-xs text-rose-300">{state.error}</p>}
+      {state.success && <p aria-live="polite" className="text-xs text-emerald-300">Reserva cancelada.</p>}
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg border border-red-300 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-50 disabled:opacity-50"
+        className="rounded-lg border border-rose-300/20 bg-rose-300/5 px-3 py-2 text-xs font-bold text-rose-200 hover:bg-rose-300/10 disabled:opacity-50"
       >
         {pending ? "Cancelando..." : "Cancelar"}
       </button>

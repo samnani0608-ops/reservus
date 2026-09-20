@@ -1,30 +1,12 @@
 "use client";
 
-// useActionState conecta el formulario del navegador
-// con la Server Action createReservation() que acabamos de crear.
+import Link from "next/link";
 import { useActionState } from "react";
 
-// Importamos la acción del servidor y el tipo
-// que define la respuesta que recibiremos.
-import {
-  createReservation,
-  type ReservationState,
-} from "./actions";
+import { createReservation, type ReservationState } from "./actions";
 
+const initialState: ReservationState = { success: false, error: null };
 
-// Estado inicial del formulario.
-//
-// Al principio:
-// - todavía no se creó ninguna reserva
-// - tampoco existe ningún error
-const initialState: ReservationState = {
-  success: false,
-  error: null,
-};
-
-
-// Estos son los datos que recibirá este componente
-// desde la página de la sala.
 type ReservationFormProps = {
   roomId: string;
   defaultDate: string;
@@ -32,66 +14,20 @@ type ReservationFormProps = {
   maxDate: string;
 };
 
-
 export default function ReservationForm({
   roomId,
   defaultDate,
   minDate,
   maxDate,
 }: ReservationFormProps) {
-
-  /*
-    useActionState conecta React con nuestra Server Action.
-
-    state:
-    contiene el último resultado del servidor.
-
-    formAction:
-    se ejecuta cuando enviamos el formulario.
-
-    pending:
-    indica si estamos esperando la respuesta del servidor.
-  */
-  const [state, formAction, pending] =
-    useActionState(
-      createReservation,
-      initialState
-    );
-
+  const [state, formAction, pending] = useActionState(createReservation, initialState);
 
   return (
-    /*
-      Cuando el usuario envía este formulario,
-      React ejecutará createReservation()
-      en el servidor.
-    */
-    <form
-      action={formAction}
-      className="mt-6 flex max-w-md flex-col gap-4"
-    >
+    <form action={formAction} className="mt-7 space-y-5">
+      <input type="hidden" name="roomId" value={roomId} />
 
-      {/*
-        El usuario no necesita escribir el ID de la sala.
-
-        Como ya estamos dentro de /rooms/[roomId],
-        enviamos ese ID de forma oculta al servidor.
-      */}
-      <input
-        type="hidden"
-        name="roomId"
-        value={roomId}
-      />
-
-
-      {/* Fecha de la reserva */}
       <div>
-        <label
-          htmlFor="reservation-date"
-          className="block font-medium"
-        >
-          Fecha
-        </label>
-
+        <label htmlFor="reservation-date" className="text-sm font-semibold text-slate-300">Fecha</label>
         <input
           id="reservation-date"
           name="date"
@@ -101,144 +37,60 @@ export default function ReservationForm({
           max={maxDate}
           defaultValue={defaultDate >= minDate && defaultDate <= maxDate ? defaultDate : ""}
           aria-describedby="reservation-date-help"
-          className="mt-1 w-full rounded border p-2"
+          className="mt-2 w-full rounded-xl border px-4 py-3 text-sm"
         />
-        {/* Estos límites orientan al usuario; servidor y RPC también los validan. */}
-        <p id="reservation-date-help" className="mt-1 text-sm">
-          Podés reservar desde hoy hasta el {maxDate.split("-").reverse().join("/")},
-          inclusive (14 días de anticipación, hora de Costa Rica).
-          Se requieren al menos 30 minutos de anticipación.
+        <p id="reservation-date-help" className="mt-2 text-xs leading-5 text-slate-400">
+          Disponible hasta el {maxDate.split("-").reverse().join("/")}, con al menos 30 minutos de anticipación.
         </p>
       </div>
 
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="startTime" className="text-sm font-semibold text-slate-300">Hora de inicio</label>
+          <input
+            id="startTime"
+            name="startTime"
+            type="time"
+            required
+            min="07:00"
+            max="20:00"
+            step="1800"
+            className="mt-2 w-full rounded-xl border px-4 py-3 text-sm"
+          />
+        </div>
 
-      {/*
-        Hora de inicio.
-
-        min y max ayudan al usuario desde el navegador,
-        pero recuerde que PostgreSQL también valida
-        el horario real.
-      */}
-      <div>
-        <label
-          htmlFor="startTime"
-          className="block font-medium"
-        >
-          Hora de inicio
-        </label>
-
-        <input
-          id="startTime"
-          name="startTime"
-          type="time"
-          required
-          min="07:00"
-          max="20:00"
-
-          /*
-            step está medido en segundos.
-
-            1800 segundos = 30 minutos.
-
-            Esto ayuda a cumplir RN02:
-            bloques de 30 minutos.
-          */
-          step="1800"
-          className="mt-1 w-full rounded border p-2"
-        />
+        <div>
+          <label htmlFor="duration" className="text-sm font-semibold text-slate-300">Duración</label>
+          <select id="duration" name="duration" defaultValue="60" className="mt-2 w-full rounded-xl border px-4 py-3 text-sm">
+            <option value="60">1 hora</option>
+            <option value="90">1 h 30 min</option>
+            <option value="120">2 horas</option>
+            <option value="150">2 h 30 min</option>
+            <option value="180">3 horas</option>
+          </select>
+        </div>
       </div>
 
-
-      {/*
-        Duración de la reserva.
-
-        RN03 permite:
-        mínimo 1 hora
-        máximo 3 horas
-
-        Usamos minutos porque nuestra Server Action
-        hace los cálculos utilizando minutos.
-      */}
-      <div>
-        <label
-          htmlFor="duration"
-          className="block font-medium"
-        >
-          Duración
-        </label>
-
-        <select
-          id="duration"
-          name="duration"
-          defaultValue="60"
-          className="mt-1 w-full rounded border p-2"
-        >
-          <option value="60">
-            1 hora
-          </option>
-
-          <option value="90">
-            1 hora 30 minutos
-          </option>
-
-          <option value="120">
-            2 horas
-          </option>
-
-          <option value="150">
-            2 horas 30 minutos
-          </option>
-
-          <option value="180">
-            3 horas
-          </option>
-        </select>
-      </div>
-
-
-      {/*
-        Si createReservation() devuelve un error,
-        lo mostramos al usuario.
-
-        Ejemplos:
-        - horario ocupado
-        - límite semanal
-        - poca anticipación
-        - sala desactivada
-      */}
       {state.error && (
-        <p className="text-sm text-red-600">
-          {state.error}
-        </p>
+        <p role="alert" className="rounded-xl border border-rose-300/15 bg-rose-300/7 p-3 text-sm text-rose-200">{state.error}</p>
       )}
 
-
-      {/*
-        Si PostgreSQL aceptó la reserva,
-        mostramos una confirmación.
-      */}
       {state.success && (
-        <p className="text-sm font-medium">
-          Reserva creada correctamente.
-        </p>
+        <div aria-live="polite" className="rounded-xl border border-emerald-300/20 bg-emerald-300/8 p-4">
+          <p className="text-sm font-bold text-emerald-200">Reserva creada correctamente.</p>
+          <Link href="/reservations" className="mt-3 inline-flex text-sm font-bold text-white underline decoration-emerald-300/50 underline-offset-4 hover:text-emerald-200">
+            Ver en Mis reservas →
+          </Link>
+        </div>
       )}
 
-
-      {/*
-        Mientras el servidor procesa la solicitud,
-        desactivamos el botón para evitar
-        que el usuario mande la misma reserva varias veces.
-      */}
       <button
         type="submit"
         disabled={pending}
-        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+        className="w-full rounded-xl bg-emerald-300 px-5 py-3.5 text-sm font-black text-emerald-950 shadow-[0_14px_40px_rgba(52,211,153,0.12)] hover:bg-emerald-200 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {pending
-          ? "Reservando..."
-          : "Crear reserva"}
+        {pending ? "Confirmando bloque..." : "Crear reserva"}
       </button>
-
     </form>
   );
 }

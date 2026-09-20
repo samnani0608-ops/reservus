@@ -8,6 +8,10 @@ import type { Metadata } from "next";
 // de tipos temporales generados por Next.js.
 import type { ReactNode } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Suspense } from "react";
+
+import SiteHeader from "@/components/site-header";
+
 import "./globals.css";
 
 const geistSans = Geist({
@@ -21,8 +25,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sistema de Reservas",
-  description: "Sistema para la gestión y reserva de salas",
+  title: {
+    default: "Reservus | Salas bajo control",
+    template: "%s | Reservus",
+  },
+  description: "Reservá salas, consultá disponibilidad y gestioná tu agenda desde un solo lugar.",
 };
 
 // Define qué datos recibe el layout principal.
@@ -42,7 +49,20 @@ export default function RootLayout({
       lang="es"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full">
+        <a className="skip-link" href="#main-content">
+          Saltar al contenido
+        </a>
+        <Suspense fallback={<div className="h-18 border-b border-white/8 bg-[#070a0f]" />}>
+          <SiteHeader />
+        </Suspense>
+        <div id="main-content" className="min-h-[calc(100vh-4.5rem)]">
+          {children}
+        </div>
+        <footer className="border-t border-white/6 px-6 py-7 text-center text-xs text-slate-600">
+          Reservus 0.2.0 · Agenda clara, reservas seguras.
+        </footer>
+      </body>
     </html>
   );
 }

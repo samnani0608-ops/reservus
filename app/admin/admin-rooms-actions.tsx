@@ -13,8 +13,9 @@ export function AdminEditButton({ room }: AdminEditButtonProps) {
   if (!showForm) {
     return (
       <button
+        type="button"
         onClick={() => setShowForm(true)}
-        className="text-blue-600 hover:text-blue-900 underline"
+        className="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-300 hover:border-emerald-300/30 hover:text-emerald-200"
       >
         Editar
       </button>
@@ -35,8 +36,9 @@ export function AdminNewRoomButton() {
   if (!showForm) {
     return (
       <button
+        type="button"
         onClick={() => setShowForm(true)}
-        className="rounded bg-black px-4 py-2 text-white"
+        className="rounded-xl bg-emerald-300 px-4 py-2.5 text-sm font-black text-emerald-950 hover:bg-emerald-200"
       >
         Nueva sala
       </button>
@@ -44,7 +46,7 @@ export function AdminNewRoomButton() {
   }
 
   return (
-    <div className="mt-4">
+    <div>
       <AdminRoomsForm onClose={() => setShowForm(false)} />
     </div>
   );
